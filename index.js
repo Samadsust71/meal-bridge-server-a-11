@@ -5,14 +5,13 @@ const app = express();
 const port = process.env.PORT || 3000;
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
-app.use(cors(
-  {
-    origin : ['http://localhost:5173'],
-    credentials:true
-  }
-));
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    credentials: true,
+  })
+);
 app.use(express.json());
-
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.qo68l.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -26,20 +25,35 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-   
     const foodsCollection = client.db("foodsDB").collection("foods");
 
     // food related apis
-    app.post('/foods',async(req,res)=>{
-      const food = req.body
+    app.post("/foods", async (req, res) => {
+      const food = req.body;
       const result = await foodsCollection.insertOne(food);
-      res.send(result)
-    })
- 
+      res.send(result);
+    });
+    app.get("/foods", async (req, res) => {
+      const status = req.query.status;
+      const search = req.query?.search;
+      const sort = req.query?.sort;
 
-    
+      const query = { status };
+      if (search) {
+        query.food_name = {
+          $regex: search,
+          $options: "i",
+        };
+      }
+      const options = {};
+      if (sort) {
+        options.sort = { expired_date: sort === "asc" ? 1 : -1 };
+      }
 
-   
+      const result = await foodsCollection.find(query, options).toArray();
+      res.send(result);
+    });
+
     await client.connect();
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });

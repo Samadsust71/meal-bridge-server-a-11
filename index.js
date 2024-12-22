@@ -69,6 +69,15 @@ async function run() {
       const result = await foodsCollection.find(query).toArray()
       res.send(result)
     })
+    
+    app.get('/foodRequests/:email',async(req,res)=>{
+      const email = req.params.email
+      const query ={
+        donee_email: email
+      }
+      const result = await foodsCollection.find(query).toArray()
+      res.send(result)
+    })
 
     app.patch('/foods/:id',async(req,res)=>{
       const id = req.params.id
@@ -88,7 +97,7 @@ async function run() {
       res.send(result)
     })
 
-    app.put('food/:id', async(req,res)=>{
+    app.put('/food/:id', async(req,res)=>{
       const id= req.params.id
     const query = {_id : new ObjectId(id)}
     const foodData = req.body

@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 app.use(
   cors({
@@ -34,7 +34,7 @@ async function run() {
       res.send(result);
     });
     app.get("/foods", async (req, res) => {
-      const status = req.query.status;
+      const status = req.query.status || "available";
       const search = req.query?.search;
       const sort = req.query?.sort;
 
@@ -53,6 +53,47 @@ async function run() {
       const result = await foodsCollection.find(query, options).toArray();
       res.send(result);
     });
+
+    app.get('/foods/:id',async(req,res)=>{
+      const id = req.params.id
+      const query = {
+        _id : new ObjectId(id)
+      }
+      const result = await foodsCollection.findOne(query)
+      res.send(result)
+    })
+
+    app.get('/myFoods/:email', async(req,res)=>{
+      const email = req.params.email
+      const query ={donator_email:email}
+      const result = await foodsCollection.find(query).toArray()
+      res.send(result)
+    })
+
+    app.patch('/foods/:id',async(req,res)=>{
+      const id = req.params.id
+      const status=req.body.status
+      const donee_email=req.body.donee_email
+      const additional_notes=req.body.additional_notes
+      const requested_time=req.body.requested_time
+      const query={
+        _id: new ObjectId(id)
+      }
+      const updatedDoc = {
+        $set:{
+            status , requested_time,additional_notes,donee_email
+        }
+      }
+      const result = await foodsCollection.updateOne(query,updatedDoc)
+      res.send(result)
+    })
+
+    app.delete('foods/:id', async(req,res)=>{
+      const id = req.params.id
+      const query = {_id : new ObjectId(id)}
+      const result = await foodsCollection.deleteOne(query)
+      res.send(result)
+    })
 
     await client.connect();
     // Send a ping to confirm a successful connection

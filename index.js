@@ -5,7 +5,12 @@ const app = express();
 const port = process.env.PORT || 3000;
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
-app.use(cors());
+app.use(cors(
+  {
+    origin : ['http://localhost:5173'],
+    credentials:true
+  }
+));
 app.use(express.json());
 
 
@@ -22,7 +27,14 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
    
+    const foodsCollection = client.db("foodsDB").collection("foods");
 
+    // food related apis
+    app.post('/foods',async(req,res)=>{
+      const food = req.body
+      const result = await foodsCollection.insertOne(food);
+      res.send(result)
+    })
  
 
     

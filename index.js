@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const jwt = require('jsonwebtoken')
+const cookieParser = require('cookie-parser');
 const app = express();
 const port = process.env.PORT || 3000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
@@ -12,6 +13,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(cookieParser())
 app.use(express.json());
 
 const verifyToken = (req,res,next)=>{
@@ -104,8 +106,13 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/myFoods/:email", async (req, res) => {
+    app.get("/myFoods/:email",verifyToken, async (req, res) => {
       const email = req.params.email;
+
+      if (req.user?.email !== email) {
+        return res.status(403).send({message: "Forbidden access"})
+      }
+
       const query = { donator_email: email };
       const result = await foodsCollection.find(query).toArray();
       res.send(result);
@@ -113,6 +120,9 @@ async function run() {
 
     app.get("/foodRequests/:email", async (req, res) => {
       const email = req.params.email;
+      if (req.user?.email !== email) {
+        return res.status(403).send({message: "Forbidden access"})
+      }
       const query = {
         donee_email: email,
       };

@@ -14,6 +14,20 @@ app.use(
 );
 app.use(express.json());
 
+const verifyToken = (req,res,next)=>{
+  const token = req?.cookies?.token
+  if (!token) return res.status(401).send({message: "Unauthorized access"})
+  
+  jwt.verify(token,process.env.ACCESS_TOKEN_SECRET,(err,decoded)=>{
+    if(err) {
+      return res.status(401).send({message: "Unauthorized access"})
+    }
+      req.user = decoded
+      next()
+  })  
+     
+}
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.qo68l.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 const client = new MongoClient(uri, {

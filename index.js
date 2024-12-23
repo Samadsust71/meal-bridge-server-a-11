@@ -57,6 +57,17 @@ async function run() {
         .send({ success: true });
     });
 
+    app.post('/logout',(req,res)=>{
+      res
+      .clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      })
+      .send({message:"Log out successfully"})
+    })
+  
+
     // food related apis
     app.post("/foods", async (req, res) => {
       const food = req.body;

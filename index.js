@@ -76,11 +76,18 @@ async function run() {
       const result = await foodsCollection.insertOne(food);
       res.send(result);
     });
+
+    app.get("/sorted-foods",async(req,res)=>{
+           const status= "available"
+           const query={status}
+           const result = await foodsCollection.find(query).sort({quantity:-1}).limit(6).toArray()
+           res.send(result)
+    })
+
     app.get("/foods", async (req, res) => {
       const status = req.query.status || "available";
       const search = req.query?.search;
       const sort = req.query?.sort;
-
       const query = { status };
       if (search) {
         query.food_name = {
@@ -92,7 +99,6 @@ async function run() {
       if (sort) {
         options.sort = { expired_date: sort === "asc" ? 1 : -1 };
       }
-
       const result = await foodsCollection.find(query, options).toArray();
       res.send(result);
     });
@@ -118,9 +124,11 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/foodRequests/:email", async (req, res) => {
+    app.get("/foodRequests/:email",verifyToken, async (req, res) => {
       const email = req.params.email;
+
       if (req.user?.email !== email) {
+        console.log(req.user?.email)
         return res.status(403).send({message: "Forbidden access"})
       }
       const query = {

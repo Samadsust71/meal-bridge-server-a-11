@@ -136,7 +136,6 @@ async function run() {
       const email = req.params.email;
 
       if (req.user?.email !== email) {
-        console.log(req.user?.email);
         return res.status(403).send({ message: "Forbidden access" });
       }
       const query = {
@@ -196,15 +195,9 @@ async function run() {
       const result = await newsCollection.findOne(query);
       res.send(result);
     });
-    // await client.connect();
-    // // Send a ping to confirm a successful connection
-    // await client.db("admin").command({ ping: 1 });
-    // console.log(
-    //   "Pinged your deployment. You successfully connected to MongoDB!"
-    // );
+   
   } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
+    
   }
 }
 run().catch(console.dir);

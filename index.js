@@ -9,7 +9,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173","https://meal-bridge.web.app","https://meal-bridge.firebaseapp.com"],
     credentials: true,
   })
 );

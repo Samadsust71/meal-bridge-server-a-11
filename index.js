@@ -43,6 +43,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const foodsCollection = client.db("foodsDB").collection("foods");
+    const newsCollection = client.db("foodsDB").collection("news-stories")
 
     // auth token apis
     app.post("/jwt", async (req, res) => {
@@ -177,6 +178,10 @@ async function run() {
       res.send(result);
     });
 
+    // news and stories api
+    app.get('/news-stories', async(req,res)=>{
+         const  result = await newsCollection.find().toArray()
+    })
     // await client.connect();
     // // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });

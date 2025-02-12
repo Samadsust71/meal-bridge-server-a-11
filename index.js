@@ -47,6 +47,7 @@ async function run() {
   try {
     const foodsCollection = client.db("foodsDB").collection("foods");
     const newsCollection = client.db("foodsDB").collection("news-stories");
+    const reviewCollection = client.db("foodsDB").collection("user-reviews");
 
     // auth token apis
     app.post("/jwt", async (req, res) => {
@@ -195,7 +196,17 @@ async function run() {
       const result = await newsCollection.findOne(query);
       res.send(result);
     });
-   
+  
+    // reviews api 
+    app.post("/user-reviews", async(req,res)=>{
+      const review = req.body
+      const result = await reviewCollection.insertOne(review)
+      res.send(result)
+    })
+    app.get("/userReviews", async(req,res)=>{
+      const result = await reviewCollection.find().toArray()
+      res.send(result)
+    })
   } finally {
     
   }
